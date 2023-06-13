@@ -2,6 +2,8 @@ import { useState } from "react";
 import { copy, linkIcon, loader, tick } from "../assets";
 import { BsArrowReturnLeft } from "react-icons/bs";
 
+import {useLazyGetSummaryQuery} from '../services/article'
+
 const Demo = () => {
 
   const [article, setArticle] = useState({
@@ -9,8 +11,22 @@ const Demo = () => {
     summary : ''
   })
 
+  const [getSummary , { error , isFetching }] = useLazyGetSummaryQuery();
+
   const handleSubmit = async(event) => {
-    alert('Submitted')
+
+    event.preventDefault();
+
+    const { data } = await getSummary({ articleUrl: article.url });
+    if (data?.summary) {
+      const newArticle = { ...article, summary: data.summary };
+
+      // update state and local storage
+      setArticle(newArticle);
+      console.log(newArticle)
+    }
+    
+    console.log(article)
   }
 
   return (
