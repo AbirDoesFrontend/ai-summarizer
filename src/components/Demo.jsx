@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { copy, linkIcon, loader, tick } from "../assets";
 import { BsArrowReturnLeft } from "react-icons/bs";
 
@@ -11,7 +11,21 @@ const Demo = () => {
     summary : ''
   })
 
+  const [allArticles, setAllArticles] = useState([])
+
   const [getSummary , { error , isFetching }] = useLazyGetSummaryQuery();
+
+  useEffect(() => {
+    const articlesFromLocalStorage = JSON.parse(
+      localStorage.getItem('articles')
+    )
+
+    if(articlesFromLocalStorage) {
+      setAllArticles(articlesFromLocalStorage)
+    }
+
+  }, [])
+  
 
   const handleSubmit = async(event) => {
 
@@ -21,12 +35,14 @@ const Demo = () => {
     if (data?.summary) {
       const newArticle = { ...article, summary: data.summary };
 
-      // update state and local storage
+      const updateAllArticles = [newArticle , ...allArticles]
+
       setArticle(newArticle);
-      console.log(newArticle)
+      setAllArticles(updateAllArticles);
+      
+      localStorage.setItem('articles' , JSON.stringify(updateAllArticles))
     }
     
-    console.log(article)
   }
 
   return (
